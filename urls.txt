@@ -1,0 +1,10 @@
+# Batch URL list for yt_to_stems.py
+# One YouTube URL per line.
+# Lines starting with # and blank lines are ignored.
+
+https://www.youtube.com/watch?v=JfOzWqxYODY
+
+
+
+
+
