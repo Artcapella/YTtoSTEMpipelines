@@ -2,7 +2,9 @@
 # One YouTube URL per line.
 # Lines starting with # and blank lines are ignored.
 
-https://www.youtube.com/watch?v=JfOzWqxYODY
+https://www.youtube.com/watch?v=BRfRXB09_hQ
+https://www.youtube.com/watch?v=KWq5XRkT6j8
+https://www.youtube.com/watch?v=_s2uYjf6ang
 
 
 

@@ -132,9 +132,23 @@ def download_audio(url: str, output_dir: str, verbose: bool = False) -> str:
     }
 
     print(f"Downloading audio from: {url}")
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        title = info.get("title", "audio")
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            title = info.get("title", "audio")
+    except yt_dlp.utils.DownloadError as e:
+        msg = str(e)
+        if "429" in msg or "Too Many Requests" in msg or "rate" in msg.lower():
+            raise RuntimeError(
+                "RATE LIMITED by YouTube (HTTP 429 / Too Many Requests).\n"
+                "  YouTube is throttling this IP. Suggestions:\n"
+                "    • Wait 15–30 minutes before retrying.\n"
+                "    • Use a VPN or different network.\n"
+                "    • Add cookies via yt-dlp --cookies-from-browser or --cookies.\n"
+                "    • Reduce batch size / add delays between downloads.\n"
+                f"  Original error: {e}"
+            ) from e
+        raise
 
     # Find the downloaded WAV file
     # yt-dlp sanitizes the filename, so we search for .wav files in the output dir
@@ -904,7 +918,14 @@ Models:
         try:
             audio_path = download_audio(args.url, download_dir, verbose=args.verbose)
         except Exception as e:
-            print(f"\nDownload failed: {e}")
+            msg = str(e)
+            if "RATE LIMITED" in msg or "429" in msg or "Too Many Requests" in msg:
+                print("\n" + "!" * 60)
+                print("  WARNING: RATE LIMITED")
+                print("!" * 60)
+                print(f"\n{e}\n")
+            else:
+                print(f"\nDownload failed: {e}")
             shutil.rmtree(download_dir, ignore_errors=True)
             sys.exit(1)
 
